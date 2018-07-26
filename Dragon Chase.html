@@ -1,4 +1,5 @@
-<html><head><title>Dragon Chase</title><script src="https://code.jquery.com/jquery-3.1.0.slim.min.js" 
+<html><head><title>Dragon Chase</title>
+<script src="https://code.jquery.com/jquery-3.1.0.slim.min.js" 
 integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8=" 
 crossorigin="anonymous"></script><style>
 div {
@@ -7,14 +8,15 @@ div {
 	width: 10px;
 	background-color: black;
 }
-img#guy {
+span#guy {
 	position: absolute;
 	width: 75px;
+	height: 50px;
 	left: 100px;
 	top: 1px;
 	background-color:black;
 }
-</style></head><body><span id="guy"/>
+</style></head><body><span id="guy"></span>
 <span id="world"></span>
 </body><script>
 var platform_up = new Map();
@@ -23,10 +25,10 @@ var going_left = false,
 	going_right = false;
 function run_loop() {
 	if (going_left) {
-		move($('guy'), -1,0);
+		move($('#guy'), -1,0);
 	}
 	if (going_right) {
-		move($('guy'), 1,0);
+		move($('#guy'), 1,0);
 	}
 	setTimeout(run_loop, 0);
 }
@@ -78,7 +80,7 @@ function jump() {
 	speed += accel;
 	$('div').each(function() {
 		if (overlap($('#guy'), $(this))) {
-			movedown($('#guy'), 10);
+			move($('#guy'), 0,10);
 			speed = 0;
 		}
 	});
@@ -90,7 +92,7 @@ function jump() {
 }
 
 function move(obj,x,y) {
-	obj.css('left', $(this).css('left') + x);
-	obj.css('top', $(this).css('top') - y);
+	obj.css('left', parseFloat($(obj).css('left')) + x + 'px');
+	obj.css('top', parseFloat($(obj).css('top')) - y + 'px');
 }
 </script></html>
