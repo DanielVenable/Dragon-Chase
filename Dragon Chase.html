@@ -1,5 +1,6 @@
-<html><head><title>Dragon Chase</title><script src="jquery-2.1.4.js"></script>
-<script src="Daniel's tools.js"></script><style>
+<html><head><title>Dragon Chase</title><script src="https://code.jquery.com/jquery-3.1.0.slim.min.js" 
+integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8=" 
+crossorigin="anonymous"></script><style>
 div {
 	position: absolute;
 	height: 10px;
@@ -11,30 +12,21 @@ img#guy {
 	width: 75px;
 	left: 100px;
 	top: 1px;
+	background-color:black;
 }
-div#lava {
-	background-color: red;
-	top: 750px;
-	left: 0px;
-}
-</style></head><body>
+</style></head><body><span id="guy"/>
 <span id="world"></span>
 </body><script>
 var platform_up = new Map();
 run_loop();
-move_platforms();
 var going_left = false,
 	going_right = false;
 function run_loop() {
 	if (going_left) {
-		move(-1,0);
+		move($('guy'), -1,0);
 	}
 	if (going_right) {
-		move(1,0);
-	}
-	if (parseFloat($("#guy").css('top')) + 94 > parseFloat($("#lava").css('top'))) {
-		$("#guy").css('top', '1px');
-		$("#guy").css('left', '100px');
+		move($('guy'), 1,0);
 	}
 	setTimeout(run_loop, 0);
 }
@@ -69,7 +61,7 @@ fall();
 function fall() {
 	if (!jumping) {
 		falls++;
-		movedown($('#guy'), speed);
+		move($('#guy'), 0, -speed);
 		speed += accel;
 		$('div').each(function() {
 			if (overlap($('#guy'), $(this))) {
@@ -82,7 +74,7 @@ function fall() {
 	setTimeout(fall, 2);
 }
 function jump() {
-	movedown($('#guy'), speed);
+	move($('#guy'), 0, speed);
 	speed += accel;
 	$('div').each(function() {
 		if (overlap($('#guy'), $(this))) {
@@ -97,8 +89,8 @@ function jump() {
 	}
 }
 
-function move(x,y) {
-	$(this).css('left', $(this).css('left') + x);
-	$(this).css('top', $(this).css('top') - y);
+function move(obj,x,y) {
+	obj.css('left', $(this).css('left') + x);
+	obj.css('top', $(this).css('top') - y);
 }
 </script></html>
