@@ -5,30 +5,23 @@ crossorigin="anonymous"></script><style>
 div {
 	position: absolute;
 	height: 10px;
-	width: 10px;
+	width: 100px;
 	background-color: black;
 }
-span#guy {
-	position: absolute;
-	width: 75px;
-	height: 50px;
-	left: 100px;
-	top: 1px;
-	background-color:black;
-}
-</style></head><body><span id="guy"></span>
+</style></head><body>
 <span id="world"></span>
 </body><script>
-var platform_up = new Map();
-run_loop();
-var going_left = false,
+var platform_up = new Map(),
+	objects = [{x:7,y:100}],
+	going_left = false,
 	going_right = false;
+run_loop();
 function run_loop() {
 	if (going_left) {
-		move($('#guy'), -1,0);
+		move_all(1,0);
 	}
 	if (going_right) {
-		move($('#guy'), 1,0);
+		move_all(-1,0);
 	}
 	setTimeout(run_loop, 0);
 }
@@ -55,6 +48,20 @@ $(document).keyup(function(e) {
 			break;
 	}
 });
+
+function draw_board() {
+	for (i = 0; i < objects.length; i++) {
+		var width = window.innerWidth/2,
+			height = window.innerHeight/2,
+			obj = objects[i];
+		$('#world').empty();
+		if (obj.x < width && obj.x + 100 > -width && obj.y - 10 < height && obj.y > -height) {
+			$('#world').append('<div style="top:' +(height - obj.y)+ 'px;' +
+				'left:' +(width + obj.x)+ 'px;"></div>');
+		}
+	}
+}
+
 var	jumping = false,
 	speed = 0.1,
 	accel = 0.05,
@@ -63,36 +70,23 @@ fall();
 function fall() {
 	if (!jumping) {
 		falls++;
-		move($('#guy'), 0, -speed);
+		move_all(0, speed);
 		speed += accel;
-		$('div').each(function() {
-			if (overlap($('#guy'), $(this))) {
-				$('#guy').css('top', parseFloat($(this).css('top')) - 89 + 'px');
-				speed = 0.1;
-				falls = 0;
-			}
-		});
 	}
 	setTimeout(fall, 2);
 }
 function jump() {
-	move($('#guy'), 0, speed);
+	move_all(0, -speed);
 	speed += accel;
-	$('div').each(function() {
-		if (overlap($('#guy'), $(this))) {
-			move($('#guy'), 0,10);
-			speed = 0;
-		}
-	});
 	if (speed < 0) {
 		setTimeout(jump, 2);
 	} else {
 		jumping = false;
 	}
 }
-
-function move(obj,x,y) {
-	obj.css('left', parseFloat($(obj).css('left')) + x + 'px');
-	obj.css('top', parseFloat($(obj).css('top')) - y + 'px');
+function move_all(x,y) {
+	for (i = 0; i < objects.length; i++) {
+		
+	}
 }
 </script></html>
