@@ -8,11 +8,17 @@ div {
 	width: 100px;
 	background-color: black;
 }
-</style></head><body>
+span#guy {
+	position: absolute;
+	height: 100px;
+	width: 100px;
+	background-color: green;
+}
+</style></head><body><span id="guy"></span>
 <span id="world"></span>
 </body><script>
 var platform_up = new Map(),
-	objects = [{x:7,y:100}],
+	objects = [{x:7,y:-200},{x:300,y:30},{x:-500,y:200},{x:-45,y:75},],
 	going_left = false,
 	going_right = false;
 run_loop();
@@ -23,20 +29,22 @@ function run_loop() {
 	if (going_right) {
 		move_all(-1,0);
 	}
+	$('#guy').css('left', window.innerWidth/2);
+	$('#guy').css('top', window.innerHeight/2);
 	setTimeout(run_loop, 0);
 }
 $(document).keydown(function(e) {
-		if (e.which == 37) {
-			going_left = true;
-		}
-		if (e.which == 39) {
-			going_right = true;
-		}
-		if (falls < 5 && !jumping && e.which == 32) {
-			speed = -5;
-			jump();
-			jumping = true;
-		}
+	if (e.which == 37) {
+		going_left = true;
+	}
+	if (e.which == 39) {
+		going_right = true;
+	}
+	if (falls < 5 && !jumping && e.which == 32) {
+		speed = -5;
+		jump();
+		jumping = true;
+	}
 });
 $(document).keyup(function(e) {
 	switch(e.which) {
@@ -50,11 +58,11 @@ $(document).keyup(function(e) {
 });
 
 function draw_board() {
+	$('#world').empty();
 	for (i = 0; i < objects.length; i++) {
 		var width = window.innerWidth/2,
 			height = window.innerHeight/2,
 			obj = objects[i];
-		$('#world').empty();
 		if (obj.x < width && obj.x + 100 > -width && obj.y - 10 < height && obj.y > -height) {
 			$('#world').append('<div style="top:' +(height - obj.y)+ 'px;' +
 				'left:' +(width + obj.x)+ 'px;"></div>');
@@ -76,7 +84,7 @@ function fall() {
 	setTimeout(fall, 2);
 }
 function jump() {
-	move_all(0, -speed);
+	move_all(0, speed);
 	speed += accel;
 	if (speed < 0) {
 		setTimeout(jump, 2);
@@ -86,7 +94,27 @@ function jump() {
 }
 function move_all(x,y) {
 	for (i = 0; i < objects.length; i++) {
-		
+		var obj = objects[i];
+		obj.x = obj.x + x;
+		obj.y = obj.y + y;
 	}
+	draw_board();
 }
+
+function overlap1d(x1, width1, x2, width2) {
+	return (
+		(x1 <= x2 && x2 - width2/2 <= x1 + width1/2)||
+		(x2 <= x1 && x1 - width1/2 <= x2 + width2/2));
+}
+function overlap(object1, object2) {
+	var xol = overlap1d(object1.x, object1.width, object2.x, 100),
+		yol = overlap1d(object1.y, object1.height, object2.y, 10);
+	return (xol && yol);
+}
+
+/*if (overlap({x:window.innerWidth/2, y:window.innerHeight/2, height:100, width:100},
+			objects[i]){
+				
+		}
+*/
 </script></html>
