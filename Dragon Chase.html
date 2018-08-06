@@ -18,7 +18,7 @@ span#guy {
 </style></head><body><span id="guy"></span>
 <span id="world"></span>
 </body><script>
-var objects = [{x:7,y:-200},{x:300,y:30},{x:-500,y:200},{x:-45,y:100}],
+var objects = [{x:7,y:-200},{x:300,y:30},{x:-500,y:200},{x:-45,y:100},{x:-400,y:0},{x:-700,y:0}],
 	guy_values = {width:100,height:100,x:0,y:0},
 	going_left = false,
 	going_right = false;
@@ -40,11 +40,9 @@ function run_loop() {
 $(document).keydown(function(e) {
 	if (e.which == 37) {
 		going_left = true;
-	}
-	if (e.which == 39) {
+	} else if (e.which == 39) {
 		going_right = true;
-	}
-	if (falls < 5 && speed > 0 && e.which == 32) {
+	} else if (falls < 5 && speed > 0 && e.which == 32) {
 		speed = -5;
 	}
 });
@@ -65,9 +63,14 @@ function draw_board() {
 		var width = window.innerWidth/2,
 			height = window.innerHeight/2,
 			obj = objects[i];
-		if (obj.x < width && obj.x + 100 > -width && obj.y - 10 < height && obj.y > -height) {
+		if (obj.x + 50 < width && obj.x + 100 > -width &&
+				obj.y - 5 < height && obj.y > 10 - height) {
 			$('#world').append('<div style="top:' +(height - obj.y - 5)+ 'px;' +
 				'left:' +(width + obj.x - 50)+ 'px;"></div>');
+		} else if (obj.y - 5 < height && obj.y > 10 - height &&
+						obj.x + 50 > width && obj.x - 50 < width) {
+			$('#world').append('<div style="top:' +(height - obj.y - 5)+ 'px;' +
+				'left:' +(width + obj.x - 50)+ 'px; width:'+(width - obj.x + 50)+';"></div>');
 		}
 	}
 }
