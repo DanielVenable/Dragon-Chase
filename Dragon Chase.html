@@ -18,8 +18,11 @@ span#guy {
 </style></head><body><span id="guy"></span>
 <span id="world"></span>
 </body><script>
-var objects = [{x:7,y:-200},{x:300,y:30},{x:-500,y:200},{x:-45,y:100},{x:-400,y:0},{x:-700,y:0}],
+var objects = [],
 	guy_values = {width:100,height:100,x:0,y:0},
+	row = 0,
+	colomn = 0,
+	all_objects = []
 	going_left = false,
 	going_right = false;
 run_loop();
@@ -57,6 +60,8 @@ $(document).keyup(function(e) {
 	}
 });
 
+window.onresize(function() { draw_board() });
+
 function draw_board() {
 	$('#world').empty();
 	for (var i = 0; i < objects.length; i++) {
@@ -64,7 +69,7 @@ function draw_board() {
 			height = window.innerHeight/2,
 			obj = objects[i];
 		if (obj.x + 50 < width && obj.x + 100 > -width &&
-				obj.y - 5 < height && obj.y > 10 - height) {
+			obj.y - 5 < height && obj.y > 10 - height) {
 			$('#world').append('<div style="top:' +(height - obj.y - 5)+ 'px;' +
 				'left:' +(width + obj.x - 50)+ 'px;"></div>');
 		} else if (obj.y - 5 < height && obj.y > 10 - height &&
@@ -75,8 +80,31 @@ function draw_board() {
 	}
 }
 
-var	jumping = false,
-	speed = 0.1,
+function add_row(is_on_bottom) {
+	for (var i = 0; i < all_objects.length; i++) {
+		if (is_on_bottom) {
+			all_objects[i].push(Math.random() < 0.5);
+		} else {
+			all_objects[i].unshift(Math.random() < 0.5);
+		}
+	}
+}
+function add_column(is_last) {
+	if (is_last) {
+		all_objects.push([]);
+	} else {
+		all_objects.unshift([])
+	}
+	for (var i = 0; i < all_objects[0].length; i++) {
+		if (is_last) {
+			all_objects[all_objects.length - 1].push(Math.random() < 0.5);
+		} else {
+			all_objects[0].push(Math.random() < 0.5);
+		}
+	}
+}
+
+var	speed = 0.1,
 	accel = 0.05,
 	falls = 0;
 fall();
