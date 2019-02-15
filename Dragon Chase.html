@@ -24,7 +24,7 @@ var objects = [],
 	relative_position = {top:0,left:0},
 	going_left = false,
 	going_right = false;
-const spacing = 100;
+const spacing = 150;
 run_loop();
 draw_board();
 
@@ -139,9 +139,9 @@ fall();
 
 function fall() {
 	falls++;
-	move_all(0, Math.max(speed, 25));
+	move_all(0, speed);
 	speed += accel;
-	setTimeout(fall, 200);
+	setTimeout(fall, 2);
 }
 
 function move_all(x,y) {
