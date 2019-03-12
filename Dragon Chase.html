@@ -15,6 +15,9 @@ span#guy {
 	background-color: green;
 	z-index: 1;
 }
+body {
+	overflow:hidden
+}
 </style></head><body><span id="guy"></span>
 <span id="world"></span>
 </body><script>
@@ -92,15 +95,19 @@ function draw_board() {
 	$('#world').empty();
 	for (var i = 0; i < objects.length; i++) {
 		const obj = objects[i];
-		if (obj.x + 50 < width && obj.x + 100 > - width &&
-				obj.y - 5 < height && obj.y > 10 - height) {
+		if (obj.x - 50 < width && obj.x + 100 > - width &&
+				obj.y - 5 < height && obj.y + 10 > - height) {
 			$('#world').append('<div style="top:' +(height - obj.y - 5)+ 'px;' +
 				'left:' +(width + obj.x - 50)+ 'px;"></div>');
+		}
+		
+		/*if (obj.x + 50 < width && obj.x + 100 > - width &&
+				obj.y - 5 < height && obj.y > 10 - height) {
 		} else if (obj.y - 5 < height && obj.y > 10 - height &&
 						obj.x + 50 > width && obj.x - 50 < width) {
 			$('#world').append('<div style="top:' +(height - obj.y - 5)+ 'px;' +
 				'left:' +(width + obj.x - 50)+ 'px; width:'+(width - obj.x + 50)+';"></div>');
-		}
+		}*/
 	}
 }
 
