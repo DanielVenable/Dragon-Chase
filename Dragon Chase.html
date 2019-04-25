@@ -16,7 +16,7 @@ span#guy {
 	z-index: 1;
 }
 body {
-	overflow:hidden
+	overflow: hidden;
 }
 </style></head><body><span id="guy"></span>
 <span id="world"></span>
@@ -25,6 +25,7 @@ var objects = [],
 	guy = {width:100,height:100,x:0,y:0},
 	all_objects = [[false],[false]],
 	relative_position = {top:0,left:0},
+	total_height = 0;
 	going_left = false,
 	going_right = false;
 const spacing = 150;
@@ -50,7 +51,7 @@ $(document).keydown(function(e) {
 		going_left = true;
 	} else if (e.which == 39) {
 		going_right = true;
-	} else if (falls < 5 && speed > 0 && e.which == 32) {
+	} else if (falls < 3 && speed > 0 && e.which == 32) {
 		speed = -5;
 	}
 });
@@ -100,14 +101,6 @@ function draw_board() {
 			$('#world').append('<div style="top:' +(height - obj.y - 5)+ 'px;' +
 				'left:' +(width + obj.x - 50)+ 'px;"></div>');
 		}
-		
-		/*if (obj.x + 50 < width && obj.x + 100 > - width &&
-				obj.y - 5 < height && obj.y > 10 - height) {
-		} else if (obj.y - 5 < height && obj.y > 10 - height &&
-						obj.x + 50 > width && obj.x - 50 < width) {
-			$('#world').append('<div style="top:' +(height - obj.y - 5)+ 'px;' +
-				'left:' +(width + obj.x - 50)+ 'px; width:'+(width - obj.x + 50)+';"></div>');
-		}*/
 	}
 }
 
@@ -155,26 +148,25 @@ function move_all(x,y) {
 	var move_allowed = true;
 	for (var i = 0; i < objects.length; i++) {
 		var obj = objects[i];
-		if (overlap(guy, {x:obj.x+x, y:obj.y+y, height:obj.height, width:obj.width})) {
+		if (overlap(guy, {x:obj.x + x, y:obj.y + y})) {
 			move_allowed = false;
 			speed = 0;
-			if (falls > 5) {
-				falls = 0;
-			}
+			falls = 0;
 			break;
 		}
 	}
 	if (move_allowed) {
 		relative_position.top -= y;
 		relative_position.left -= x;
+		total_height -= y;
 		draw_board();
 	}
 }
 
 function overlap1d(x1, width1, x2, width2) {
 	return (
-		(x1 <= x2 && x2 - width2/2 <= x1 + width1/2)||
-		(x2 <= x1 && x1 - width1/2 <= x2 + width2/2));
+		(x1 <= x2 && x2 - width2/2 < x1 + width1/2)||
+		(x2 <= x1 && x1 - width1/2 < x2 + width2/2));
 }
 function overlap(object1, object2) {
 	var xol = overlap1d(object1.x, object1.width, object2.x, 100),
