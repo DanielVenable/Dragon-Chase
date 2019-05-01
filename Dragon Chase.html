@@ -15,17 +15,24 @@ span#guy {
 	background-color: green;
 	z-index: 1;
 }
+span#dragon {
+	position: absolute;
+	height: 100px;
+	width: 100px;
+	background-color: blue;
+	z-index: 2;
+}
 body {
 	overflow: hidden;
 }
-</style></head><body><span id="guy"></span>
-<span id="world"></span>
-</body><script>
+</style>
+</head><body><span id="guy"></span><span id="world"></span><span id="dragon"></span></body><script>
 var objects = [],
 	guy = {width:100,height:100,x:0,y:0},
 	all_objects = [[false],[false]],
 	relative_position = {top:0,left:0},
-	total_height = 0;
+	total_height = 0,
+	dragon = {speed: 0.25, width:100, height:100, x:500,y:500},
 	going_left = false,
 	going_right = false;
 const spacing = 150;
@@ -43,6 +50,10 @@ function run_loop() {
 	}
 	$('#guy').css('left', width - guy.width/2);
 	$('#guy').css('top', height - guy.height/2);
+	const dist = Math.sqrt(dragon.x ** 2 + dragon.y ** 2);
+	dragon.x -= dragon.x * dragon.speed / dist;
+	dragon.y -= dragon.y * dragon.speed / dist;
+	draw_board();
 	setTimeout(run_loop, 0);
 }
 
@@ -102,6 +113,8 @@ function draw_board() {
 				'left:' +(width + obj.x - 50)+ 'px;"></div>');
 		}
 	}
+	$("#dragon").css("left", width + dragon.x);
+	$("#dragon").css("top", height - dragon.y);
 }
 
 function add_row(is_on_bottom) {
@@ -115,6 +128,7 @@ function add_row(is_on_bottom) {
 	}
 	return all_objects;
 }
+
 function add_column(is_last) {
 	if (is_last) {
 		all_objects.push([]);
@@ -159,6 +173,8 @@ function move_all(x,y) {
 		relative_position.top -= y;
 		relative_position.left -= x;
 		total_height -= y;
+		dragon.x += x;
+		dragon.y += y;
 		draw_board();
 	}
 }
@@ -168,6 +184,7 @@ function overlap1d(x1, width1, x2, width2) {
 		(x1 <= x2 && x2 - width2/2 < x1 + width1/2)||
 		(x2 <= x1 && x1 - width1/2 < x2 + width2/2));
 }
+
 function overlap(object1, object2) {
 	var xol = overlap1d(object1.x, object1.width, object2.x, 100),
 		yol = overlap1d(object1.y, object1.height, object2.y, 10);
