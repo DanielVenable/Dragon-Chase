@@ -25,14 +25,14 @@ span#dragon {
 body {
 	overflow: hidden;
 }
-</style><!--<link rel="icon" href="dragon.png">-->
+</style>
 </head><body><span id="guy"></span><span id="world"></span><span id="dragon"></span></body><script>
 var objects = [],
 	guy = {width:100,height:100,x:0,y:0},
 	all_objects = [[false],[false]],
 	relative_position = {top:0,left:0},
 	total_height = 0,
-	dragon = {speed: 0.75, width:100, height:100, x:500,y:500},
+	dragon = {speed: 0.9, width:100, height:100, x:500,y:500},
 	going_left = false,
 	going_right = false;
 const spacing = 150;
@@ -55,11 +55,11 @@ function run_loop() {
 	dragon.y -= dragon.y * dragon.speed / dist;
 	draw_board();
 	if (dist < 100) {
-		$("body").append('<h1 align="center">You lose.</h1>');
+		$("body").append('<h1 align="center">You ' + (dragon.speed > 0 ? 'lose.' : 'win!') + '</h1>');
 		return;
-	} else if (total_height >= 5000) {
-		$("body").append('<h1 align="center">You win!</h1>');
-		return;
+	} else if (total_height >= 5000 && dragon.speed > 0) {
+		dragon.speed = -dragon.speed;
+		alert("You got the sword!")
 	}
 	setTimeout(run_loop, 0);
 }
