@@ -29,25 +29,20 @@ body {
 </head><body><span id="guy"></span><span id="world"></span><span id="dragon"></span></body><script>
 var objects = [],
 	guy = {width:100,height:100,x:0,y:0},
-	all_objects = [[false],[false]],
+	all_objects = [[]],
 	relative_position = {top:0,left:0},
 	total_height = 0,
-	dragon = {speed: 0.9, width:100, height:100, x:500,y:500},
+	dragon = {speed: 0.9, width:100, height:100, x:500, y:500},
 	going_left = false,
 	going_right = false;
 const spacing = 150;
 run_loop();
-draw_board();
 
 function run_loop() {
 	var width = window.innerWidth/2,
 		height = window.innerHeight/2;
-	if (going_left) {
-		move_all(1,0);
-	}
-	if (going_right) {
-		move_all(-1,0);
-	}
+	if (going_left) move_all(1,0);
+	if (going_right) move_all(-1,0);
 	$('#guy').css('left', width - guy.width/2);
 	$('#guy').css('top', height - guy.height/2);
 	const dist = Math.sqrt(dragon.x ** 2 + dragon.y ** 2);
@@ -55,13 +50,25 @@ function run_loop() {
 	dragon.y -= dragon.y * dragon.speed / dist;
 	draw_board();
 	if (dist < 100) {
-		$("body").append('<h1 align="center">You ' + (dragon.speed > 0 ? 'lose.' : 'win!') + '</h1>');
+		$("body").append('<h1 align="center">' +
+						(dragon.speed > 0 ? 'The dragon got you. You lose.' :
+											'You got the dragon. You win!') + '</h1>');
 		return;
 	} else if (total_height >= 5000 && dragon.speed > 0) {
 		dragon.speed = -dragon.speed;
-		alert("You got the sword!")
+		$("body").append('<h1 align="center" id="sword message">You got the sword!</h1>');
+		setTimeout($("#sword message")[0].remove, 500);
 	}
-	setTimeout(run_loop, 0);
+	if (dist > 1000) {
+		if (dragon.speed > 0) {
+			dragon.x -= dragon.x * (dist - 1000) / dist;
+			dragon.y -= dragon.y * (dist - 1000) / dist;
+		} else if (dist > 2000) {
+			$("body").append('<h1 align="center">The dragon got away. You lose.</h1>');
+			return;
+		}
+	}
+ 	setTimeout(run_loop, 0);
 }
 
 $(document).keydown(function(e) {
@@ -133,7 +140,6 @@ function add_row(is_on_bottom) {
 			relative_position.top += spacing;
 		}
 	}
-	return all_objects;
 }
 
 function add_column(is_last) {
@@ -150,7 +156,6 @@ function add_column(is_last) {
 			all_objects[0].push(Math.random() < 0.25);
 		}
 	}
-	return all_objects;
 }
 
 var	speed = 0.1,
