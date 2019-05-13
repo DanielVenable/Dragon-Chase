@@ -50,7 +50,8 @@ var objects = [],
 	accel = 0.04,
 	falls = 0;
 const spacing = 150;
-//start(5, 0.9);
+fall();
+
 function start(jump, speed) {
 	$("#stuff")[0].removeAttribute("hidden");
 	$("#buttons")[0].setAttribute("hidden", "hidden");
@@ -66,7 +67,6 @@ function start(jump, speed) {
 	accel = 0.04;
 	falls = 0;
 	run_loop();
-	fall();
 }
 
 function run_loop() {
@@ -203,8 +203,10 @@ function move_all(x,y) {
 		var obj = objects[i];
 		if (overlap(guy, {x:obj.x + x, y:obj.y + y})) {
 			move_allowed = false;
-			fall_speed = 0;
-			falls = 0;
+			if (y != 0) {
+				fall_speed = 0;
+				falls = 0;
+			}
 			break;
 		}
 	}
