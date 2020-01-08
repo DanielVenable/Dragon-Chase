@@ -21,9 +21,9 @@ canvas {
 	<button onclick="start(5, 1.5);">Level 10</button>
 </span><span id="messages"></span></body><script>
 var objects = [],
-	guy = {width:100,height:100,x:0,y:0},
+	guy = {width:100,height:100,x:450,y:450},
 	all_objects = [[]],
-	relative_position = {top:75,left:0},
+	relative_position = {x:75,x:0},
 	total_height = 0,
 	dragon = {speed: 0.9, width:100, height:100, x:500, y:500},
 	going_left = false,
@@ -44,10 +44,10 @@ function start(jump, speed) {
 	$("#messages").empty();
 	all_objects = [[]];
 	total_height = 0;
-	relative_position = {top:75,left:0};
+	relative_position = {x:0, y:75};
 	dragon.speed = speed;
-	dragon.x = 500;
-	dragon.y = 500;
+	dragon.x = 1000;
+	dragon.y = -1000;
 	jump_speed = jump;
 	fall_speed = 0.1;
 	accel = 0.04;
@@ -58,7 +58,7 @@ function start(jump, speed) {
 function run_loop() {
 	if (going_left) move_all(10,0);
 	if (going_right) move_all(-10,0);
-	const dist = Math.sqrt(dragon.x ** 2 + dragon.y ** 2);
+	const dist = Math.sqrt((dragon.x - 450) ** 2 + (dragon.y - 450) ** 2);
 	dragon.x -= dragon.x * dragon.speed / dist;
 	dragon.y -= dragon.y * dragon.speed / dist;
 	draw_board();
@@ -103,41 +103,36 @@ $(document).keyup(function(e) {
 
 function draw_board() {
 	// make sure all the board has objects on it
-	while (relative_position.left < width) {
+	while (relative_position.x < 0) {
 		add_column(false);
 	}
-	while (relative_position.top < height) {
+	while (relative_position.y < 0) {
 		add_row(false);
 	}
-	while (all_objects.length * spacing < relative_position.left + width) {
+	while (all_objects.length * spacing < relative_position.x + 2 * width) {
 		add_column(true);
 	}
-	while (all_objects[0].length * spacing < relative_position.top + height) {
+	while (all_objects[0].length * spacing < relative_position.y + 2 * height) {
 		add_row(true);
 	}
 	// only draw objects that are close
 	objects = [];
 	for (var i = 0; i < all_objects.length; i++) {
 		for (var j = 0; j < all_objects[i].length; j++) {	
-			const left_pos = i * spacing - relative_position.left,
-				   top_pos = j * spacing - relative_position.top;
-			if (all_objects[i][j] && left_pos < spacing + width && left_pos > -spacing - width &&
-								top_pos < spacing + height && top_pos > -spacing - height) {
-				objects.push({x: left_pos, y: top_pos});
+			const x = i * spacing - relative_position.x,
+				  y = j * spacing - relative_position.y;
+			if (all_objects[i][j] && x > -100 && y > -10 && x < width * 2 && y < height * 2) {
+				objects.push({x: x, y: y});
 			}
 		}
 	}
 	// draw the board
 	canvas.clearRect(0, 0, width * 2, height * 2);
 	for (var i = 0; i < objects.length; i++) {
-		canvas.fillRect(height - objects[i].y - 5, width + objects[i].x - 50, 100, 10);
+		canvas.fillRect(objects[i].x, objects[i].y, 100, 10);
 	}
-	draw_dragon(width + dragon.x - dragon.width/2, height - dragon.y - dragon.height/2);
+	canvas.fillRect(dragon.x, dragon.y, 100, 100);
 	canvas.fillRect(450,450,100,100);
-}
-
-function draw_dragon(x, y) {
-	canvas.fillRect(x, y, 100, 100);
 }
 
 function add_row(is_on_bottom) {
@@ -146,7 +141,7 @@ function add_row(is_on_bottom) {
 			all_objects[i].push(Math.random() < 0.25);
 		} else {
 			all_objects[i].unshift(Math.random() < 0.25);
-			relative_position.top += spacing;
+			relative_position.y += spacing;
 		}
 	}
 }
@@ -156,7 +151,7 @@ function add_column(is_last) {
 		all_objects.push([]);
 	} else {
 		all_objects.unshift([]);
-		relative_position.left += spacing;
+		relative_position.x += spacing;
 	}
 	for (var i = 0; i < all_objects[1].length; i++) {
 		if (is_last) {
@@ -177,8 +172,7 @@ function fall() {
 function move_all(x, y) {
 	var move_allowed = true;
 	for (var i = 0; i < objects.length; i++) {
-		var obj = objects[i];
-		if (overlap(guy, {x:obj.x + x, y:obj.y + y})) {
+		if (overlap(guy, objects[i])) {
 			move_allowed = false;
 			if (y != 0) {
 				fall_speed = 0;
@@ -188,19 +182,19 @@ function move_all(x, y) {
 		}
 	}
 	if (move_allowed) {
-		relative_position.top -= y;
-		relative_position.left -= x;
-		total_height -= y;
-		dragon.x += x;
-		dragon.y += y;
+		relative_position.x += x;
+		relative_position.y += y;
+		total_height += y;
+		dragon.x -= y;
+		dragon.y -= x;
 		draw_board();
 	}
 }
 
 function overlap1d(x1, width1, x2, width2) {
 	return (
-		(x1 <= x2 && x2 - width2/2 < x1 + width1/2)||
-		(x2 <= x1 && x1 - width1/2 < x2 + width2/2));
+		(x1 <= x2 && x2 < x1 + width1)||
+		(x2 <= x1 && x1 < x2 + width2));
 }
 
 function overlap(object1, object2) {
