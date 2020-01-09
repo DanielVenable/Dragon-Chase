@@ -23,7 +23,7 @@ canvas {
 var objects = [],
 	guy = {width:100,height:100,x:450,y:450},
 	all_objects = [[]],
-	relative_position = {x:75,x:0},
+	relative_position = {x:75,y:0},
 	total_height = 0,
 	dragon = {speed: 0.9, width:100, height:100, x:500, y:500},
 	going_left = false,
@@ -164,7 +164,7 @@ function add_column(is_last) {
 
 function fall() {
 	falls++;
-	move_all(0, fall_speed);
+	move_all(0, -fall_speed);
 	fall_speed += accel;
 	setTimeout(fall, 10);
 }
@@ -172,7 +172,12 @@ function fall() {
 function move_all(x, y) {
 	var move_allowed = true;
 	for (var i = 0; i < objects.length; i++) {
-		if (overlap(guy, objects[i])) {
+		if (overlap({
+				x: guy.x - x,
+				y: guy.y - y,
+				width: guy.width,
+				height: guy.height
+				}, objects[i])) {
 			move_allowed = false;
 			if (y != 0) {
 				fall_speed = 0;
@@ -182,11 +187,11 @@ function move_all(x, y) {
 		}
 	}
 	if (move_allowed) {
-		relative_position.x += x;
-		relative_position.y += y;
-		total_height += y;
-		dragon.x -= y;
-		dragon.y -= x;
+		relative_position.x -= x;
+		relative_position.y -= y;
+		total_height -= y;
+		dragon.x += x;
+		dragon.y += y;
 		draw_board();
 	}
 }
