@@ -21,10 +21,9 @@ canvas {
 	<button onclick="start(5, 1.5);">Level 10</button>
 </span><span id="messages"></span></body><script>
 var objects = [],
-	guy = {width:100,height:100,x:450,y:450},
-	all_objects = [[]],
-	relative_position = {x:75,y:0},
-	total_height = 0,
+	seed1 = Math.random(),
+	seed2 = Math.random(),
+	guy = {width:100,height:100,x:0,y:15},
 	dragon = {speed: 0.9, width:100, height:100, x:500, y:500},
 	going_left = false,
 	going_right = false,
@@ -56,8 +55,8 @@ function start(jump, speed) {
 }
 
 function run_loop() {
-	if (going_left) move_all(10,0);
-	if (going_right) move_all(-10,0);
+	if (going_left) move(-5,0);
+	if (going_right) move(5,0);
 	const dist = Math.sqrt((dragon.x - 450) ** 2 + (dragon.y - 450) ** 2);
 	dragon.x -= dragon.x * dragon.speed / dist;
 	dragon.y -= dragon.y * dragon.speed / dist;
@@ -102,98 +101,52 @@ $(document).keyup(function(e) {
 });
 
 function draw_board() {
-	// make sure all the board has objects on it
-	while (relative_position.x < 0) {
-		add_column(false);
-	}
-	while (relative_position.y < 0) {
-		add_row(false);
-	}
-	while (all_objects.length * spacing < relative_position.x + 2 * width) {
-		add_column(true);
-	}
-	while (all_objects[0].length * spacing < relative_position.y + 2 * height) {
-		add_row(true);
-	}
-	// only draw objects that are close
-	objects = [];
-	for (var i = 0; i < all_objects.length; i++) {
-		for (var j = 0; j < all_objects[i].length; j++) {	
-			const x = i * spacing - relative_position.x,
-				  y = j * spacing - relative_position.y;
-			if (all_objects[i][j] && x > -100 && y > -10 && x < width * 2 && y < height * 2) {
-				objects.push({x: x, y: y});
-			}
-		}
-	}
-	// draw the board
+	objects = find_near_platforms()
 	canvas.clearRect(0, 0, width * 2, height * 2);
 	for (var i = 0; i < objects.length; i++) {
-		canvas.fillRect(objects[i].x, objects[i].y, 100, 10);
+		canvas.fillRect(-guy.x + objects[i].x + width - guy.width/2, - guy.y + objects[i].y + height - guy.height/2, 100, 10);
 	}
 	canvas.fillRect(dragon.x, dragon.y, 100, 100);
 	canvas.fillRect(450,450,100,100);
 }
 
-function add_row(is_on_bottom) {
-	for (var i = 0; i < all_objects.length; i++) {
-		if (is_on_bottom) {
-			all_objects[i].push(Math.random() < 0.25);
-		} else {
-			all_objects[i].unshift(Math.random() < 0.25);
-			relative_position.y += spacing;
+function find_near_platforms() {
+	platforms = [];
+	for (var x = Math.floor((guy.x - width)/spacing); x < Math.ceil((guy.x + width + guy.width)/spacing); x++) {
+		for (var y = Math.floor((guy.y - height)/spacing); y < Math.ceil((guy.y + height + guy.height)/spacing); y++) {
+			if (is_platform(x,y)) platforms.push({x:x * spacing, y:y * spacing});
 		}
 	}
-}
-
-function add_column(is_last) {
-	if (is_last) {
-		all_objects.push([]);
-	} else {
-		all_objects.unshift([]);
-		relative_position.x += spacing;
-	}
-	for (var i = 0; i < all_objects[1].length; i++) {
-		if (is_last) {
-			all_objects[all_objects.length - 1].push(Math.random() < 0.25);
-		} else {
-			all_objects[0].push(Math.random() < 0.25);
-		}
-	}
+	return platforms;
 }
 
 function fall() {
 	falls++;
-	move_all(0, -fall_speed);
+	move(0, fall_speed);
 	fall_speed += accel;
 	setTimeout(fall, 10);
 }
 
-function move_all(x, y) {
+function move(x, y) {
 	var move_allowed = true;
+	guy.x += x;
+	guy.y += y;
+	dragon.x -= x;
+	dragon.y -= y;
 	for (var i = 0; i < objects.length; i++) {
-		if (overlap({
-				x: guy.x - x,
-				y: guy.y - y,
-				width: guy.width,
-				height: guy.height
-				}, objects[i])) {
-			move_allowed = false;
+		if (overlap(guy, objects[i])) {
+			guy.x -= x;
+			guy.y -= y;
+			dragon.x += x;
+			dragon.y += y;
 			if (y != 0) {
 				fall_speed = 0;
 				falls = 0;
 			}
-			break;
+			return;
 		}
 	}
-	if (move_allowed) {
-		relative_position.x -= x;
-		relative_position.y -= y;
-		total_height -= y;
-		dragon.x += x;
-		dragon.y += y;
-		draw_board();
-	}
+	draw_board();
 }
 
 function overlap1d(x1, width1, x2, width2) {
@@ -206,5 +159,10 @@ function overlap(object1, object2) {
 	var xol = overlap1d(object1.x, object1.width, object2.x, 100),
 		yol = overlap1d(object1.y, object1.height, object2.y, 10);
 	return (xol && yol);
+}
+
+function is_platform(x, y) {
+	console.assert(x % 1 == 0 && y % 1 == 0);
+	return Math.floor((Math.sin(seed1 + x) + Math.sin(seed2 + y)) * 1000) % 1000 < 2;
 }
 </script></html>
