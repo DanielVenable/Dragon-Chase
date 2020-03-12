@@ -9,16 +9,16 @@ canvas {
 }
 </style></head><body><canvas width="1000px" height="1000px"></canvas>
 <span id="buttons">
-	<button onclick="start(8, 0.5);">Level 1</button>
-	<button onclick="start(8, 0.75);">Level 2</button>
-	<button onclick="start(7, 0.75);">Level 3</button>
-	<button onclick="start(6.25, 0.75);">Level 4</button>
-	<button onclick="start(5, 0.75);">Level 5</button>
-	<button onclick="start(5, 0.9);">Level 6</button>
-	<button onclick="start(5, 1);">Level 7</button>
-	<button onclick="start(7, 1.25);">Level 8</button>
-	<button onclick="start(5, 1.25);">Level 9</button>
-	<button onclick="start(5, 1.5);">Level 10</button>
+	<button onclick="start(8, 1.5);">Level 1</button>
+	<button onclick="start(8, 2.25);">Level 2</button>
+	<button onclick="start(7, 2.25);">Level 3</button>
+	<button onclick="start(6.25, 2.25);">Level 4</button>
+	<button onclick="start(5, 2.25);">Level 5</button>
+	<button onclick="start(5, 2.7);">Level 6</button>
+	<button onclick="start(5, 3);">Level 7</button>
+	<button onclick="start(7, 3.5);">Level 8</button>
+	<button onclick="start(5, 3.5);">Level 9</button>
+	<button onclick="start(5, 4);">Level 10</button>
 </span><span id="messages"></span></body><script>
 var objects = [],
 	seed1 = Math.random(),
@@ -34,6 +34,7 @@ var objects = [],
 const spacing = 150,
 	height = 500,
 	width = 500,
+	platform_probability = 0.3,
 	canvas = $('canvas')[0].getContext('2d');
 canvas.fillStyle = "#000000";
 fall();
@@ -41,9 +42,6 @@ fall();
 function start(jump, speed) {
 	$("#buttons")[0].setAttribute("hidden", "hidden");
 	$("#messages").empty();
-	all_objects = [[]];
-	total_height = 0;
-	relative_position = {x:0, y:75};
 	dragon.speed = speed;
 	dragon.x = 1000;
 	dragon.y = -1000;
@@ -51,22 +49,26 @@ function start(jump, speed) {
 	fall_speed = 0.1;
 	accel = 0.04;
 	falls = 0;
+	seed1 = Math.random();
+	seed2 = Math.random();
+	guy.x = 0;
+	guy.y = 15;
 	run_loop();
 }
 
 function run_loop() {
-	if (going_left) move(-5,0);
-	if (going_right) move(5,0);
-	const dist = Math.sqrt((dragon.x - 450) ** 2 + (dragon.y - 450) ** 2);
-	dragon.x -= dragon.x * dragon.speed / dist;
-	dragon.y -= dragon.y * dragon.speed / dist;
+	if (going_left) move(-3,0);
+	if (going_right) move(3,0);
+	const dist = Math.sqrt((dragon.x - guy.x) ** 2 + (dragon.y - guy.y) ** 2);
+	dragon.x += (guy.x - dragon.x) * dragon.speed / dist;
+	dragon.y += (guy.y - dragon.y) * dragon.speed / dist;
 	draw_board();
 	if (dist < 100) {
 		$("#messages").append('<h1 align="center">' + (dragon.speed > 0 ?
 			'The dragon got you. You lose.' : 'You got the dragon. You win!') + '</h1>');
 		$("#buttons")[0].removeAttribute("hidden");
 		return;
-	} else if (total_height >= 5000 && dragon.speed > 0) {
+	} else if (guy.y <= -5000 && dragon.speed > 0) {
 		dragon.speed = -dragon.speed;
 		$("#messages").append('<h1 align="center">You got the sword!</h1>');
 		setTimeout(function () { $("#messages").empty(); }, 1000);
@@ -106,7 +108,7 @@ function draw_board() {
 	for (var i = 0; i < objects.length; i++) {
 		canvas.fillRect(-guy.x + objects[i].x + width - guy.width/2, - guy.y + objects[i].y + height - guy.height/2, 100, 10);
 	}
-	canvas.fillRect(dragon.x, dragon.y, 100, 100);
+	canvas.fillRect(-guy.x + dragon.x + width - guy.width/2, - guy.y + dragon.y + height - guy.height/2, 100, 100);
 	canvas.fillRect(450,450,100,100);
 }
 
@@ -131,14 +133,10 @@ function move(x, y) {
 	var move_allowed = true;
 	guy.x += x;
 	guy.y += y;
-	dragon.x -= x;
-	dragon.y -= y;
 	for (var i = 0; i < objects.length; i++) {
 		if (overlap(guy, objects[i])) {
 			guy.x -= x;
 			guy.y -= y;
-			dragon.x += x;
-			dragon.y += y;
 			if (y != 0) {
 				fall_speed = 0;
 				falls = 0;
@@ -162,7 +160,8 @@ function overlap(object1, object2) {
 }
 
 function is_platform(x, y) {
-	console.assert(x % 1 == 0 && y % 1 == 0);
-	return Math.floor((Math.sin(seed1 + x) + Math.sin(seed2 + y)) * 1000) % 1000 < 2;
+	if (x < 0) x = 0.5 - x;
+	if (y < 0) y = 0.5 - y;
+	return (x ** seed1 + y ** seed2) * 1000 % 1 < platform_probability
 }
 </script></html>
