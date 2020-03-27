@@ -27,16 +27,19 @@ var objects = [],
 	dragon = {speed: 0.9, width:100, height:100, x:500, y:500},
 	going_left = false,
 	going_right = false,
-	jump_speed = 30;
+	jump_speed = 30,
 	fall_speed = 0.5,
-	accel = 0.2,
-	falls = 0;
+	accel = 0.1,
+	falls = 0,
+	dragon_img= new Image();
 const spacing = 150,
 	height = 500,
 	width = 500,
 	platform_probability = 0.3,
 	canvas = $('canvas')[0].getContext('2d');
 canvas.fillStyle = "#000000";
+dragon_img.src = "Dragon.png";
+canvas.imageSmoothingEnabled = false;
 fall();
 
 function start(jump, speed) {
@@ -47,7 +50,7 @@ function start(jump, speed) {
 	dragon.y = -1000;
 	jump_speed = jump;
 	fall_speed = 0.1;
-	accel = 0.04;
+	accel = 0.1;
 	falls = 0;
 	seed1 = Math.random();
 	seed2 = Math.random();
@@ -108,7 +111,7 @@ function draw_board() {
 	for (var i = 0; i < objects.length; i++) {
 		canvas.fillRect(-guy.x + objects[i].x + width - guy.width/2, - guy.y + objects[i].y + height - guy.height/2, 100, 10);
 	}
-	canvas.fillRect(-guy.x + dragon.x + width - guy.width/2, - guy.y + dragon.y + height - guy.height/2, 100, 100);
+	canvas.drawImage(dragon_img, -guy.x + dragon.x + width - guy.width/2, - guy.y + dragon.y + height - guy.height/2, 64 * 10, 35 * 10);
 	canvas.fillRect(450,450,100,100);
 }
 
@@ -162,6 +165,6 @@ function overlap(object1, object2) {
 function is_platform(x, y) {
 	if (x < 0) x = 0.5 - x;
 	if (y < 0) y = 0.5 - y;
-	return (x ** seed1 + y ** seed2) * 1000 % 1 < platform_probability
+	return (x ** seed1 + y ** seed2) * 1000 % 1 < platform_probability;
 }
 </script></html>
