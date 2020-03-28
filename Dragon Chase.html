@@ -7,7 +7,7 @@ canvas {
 	width: 1000px;
 	border: 5px solid black;
 }
-</style></head><body><canvas width="1000px" height="1000px"></canvas>
+</style></head><body>
 <span id="buttons">
 	<button onclick="start(8, 1.5);">Level 1</button>
 	<button onclick="start(8, 2.25);">Level 2</button>
@@ -19,26 +19,29 @@ canvas {
 	<button onclick="start(7, 3.5);">Level 8</button>
 	<button onclick="start(5, 3.5);">Level 9</button>
 	<button onclick="start(5, 4);">Level 10</button>
-</span><span id="messages"></span></body><script>
+</span><br/><span id="messages"></span><canvas width="1000px" height="1000px"></canvas></body><script>
 var objects = [],
 	seed1 = Math.random(),
 	seed2 = Math.random(),
 	guy = {width:100,height:100,x:0,y:15},
-	dragon = {speed: 0.9, width:100, height:100, x:500, y:500},
+	dragon = {speed: 0.9, width:260, height:100, x:500, y:500},
 	going_left = false,
 	going_right = false,
 	jump_speed = 30,
 	fall_speed = 0.5,
 	accel = 0.1,
 	falls = 0,
-	dragon_img= new Image();
+	left_dragon_img = new Image(),
+	right_dragon_img = new Image();
 const spacing = 150,
 	height = 500,
 	width = 500,
+	dragon_scale = 10;
 	platform_probability = 0.3,
 	canvas = $('canvas')[0].getContext('2d');
 canvas.fillStyle = "#000000";
-dragon_img.src = "Dragon.png";
+left_dragon_img.src = "Left dragon.png";
+right_dragon_img.src = "Right dragon.png";
 canvas.imageSmoothingEnabled = false;
 fall();
 
@@ -67,21 +70,21 @@ function run_loop() {
 	dragon.y += (guy.y - dragon.y) * dragon.speed / dist;
 	draw_board();
 	if (dist < 100) {
-		$("#messages").append('<h1 align="center">' + (dragon.speed > 0 ?
+		$("#messages").append('<h1>' + (dragon.speed > 0 ?
 			'The dragon got you. You lose.' : 'You got the dragon. You win!') + '</h1>');
 		$("#buttons")[0].removeAttribute("hidden");
 		return;
 	} else if (guy.y <= -5000 && dragon.speed > 0) {
 		dragon.speed = -dragon.speed;
-		$("#messages").append('<h1 align="center">You got the sword!</h1>');
+		$("#messages").append('<h1">You got the sword!</h1>');
 		setTimeout(function () { $("#messages").empty(); }, 1000);
 	}
 	if (dist > 1000) {
 		if (dragon.speed > 0) {
-			dragon.x -= dragon.x * (dist - 1000) / dist;
-			dragon.y -= dragon.y * (dist - 1000) / dist;
+			dragon.x += (guy.x - dragon.x) * dragon.speed / dist;
+			dragon.y += (guy.y - dragon.y) * dragon.speed / dist;
 		} else if (dist > 2000) {
-			$("#messages").append('<h1 align="center">The dragon got away. You lose.</h1>');
+			$("#messages").append('<h1">The dragon got away. You lose.</h1>');
 			$("#buttons")[0].removeAttribute("hidden");
 			return;
 		}
@@ -111,7 +114,17 @@ function draw_board() {
 	for (var i = 0; i < objects.length; i++) {
 		canvas.fillRect(-guy.x + objects[i].x + width - guy.width/2, - guy.y + objects[i].y + height - guy.height/2, 100, 10);
 	}
-	canvas.drawImage(dragon_img, -guy.x + dragon.x + width - guy.width/2, - guy.y + dragon.y + height - guy.height/2, 64 * 10, 35 * 10);
+	if (dragon.x > guy.x) {
+		canvas.drawImage(left_dragon_img,
+			- guy.x + dragon.x + width - guy.width/2,
+			- guy.y + dragon.y + height - guy.height/2 - 150,
+			64 * dragon_scale, 35 * dragon_scale);
+	} else {
+		canvas.drawImage(right_dragon_img,
+			- guy.x + dragon.x + width - guy.width/2 - 64 * dragon_scale + dragon.width/2,
+			- guy.y + dragon.y + height - guy.height/2 - 150,
+			64 * dragon_scale, 35 * dragon_scale);
+	}
 	canvas.fillRect(450,450,100,100);
 }
 
