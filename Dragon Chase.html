@@ -97,7 +97,7 @@ $(document).keydown(function(e) {
 		going_left = true;
 	} else if (e.which == 39) {
 		going_right = true;
-	} else if (falls < 3 && fall_speed > 0 && (e.which == 32 || e.which == 38) {
+	} else if (falls < 3 && fall_speed > 0 && (e.which == 32 || e.which == 38)) {
 		fall_speed = -jump_speed;
 	}
 });
