@@ -9,16 +9,16 @@ canvas {
 }
 </style></head><body>
 <span id="buttons">
-	<button onclick="start(8, 1.5);">Level 1</button>
-	<button onclick="start(8, 2.25);">Level 2</button>
-	<button onclick="start(7, 2.25);">Level 3</button>
-	<button onclick="start(6.25, 2.25);">Level 4</button>
-	<button onclick="start(5, 2.25);">Level 5</button>
-	<button onclick="start(5, 2.7);">Level 6</button>
-	<button onclick="start(5, 3);">Level 7</button>
-	<button onclick="start(7, 3.5);">Level 8</button>
-	<button onclick="start(5, 3.5);">Level 9</button>
-	<button onclick="start(5, 4);">Level 10</button>
+	<button onclick="start(10, 1.5);">Level 1</button>
+	<button onclick="start(10, 2);">Level 2</button>
+	<button onclick="start(8, 2);">Level 3</button>
+	<button onclick="start(8, 2.25);">Level 4</button>
+	<button onclick="start(8, 2.5);">Level 5</button>
+	<button onclick="start(8, 2.75);">Level 6</button>
+	<button onclick="start(8, 3);">Level 7</button>
+	<button onclick="start(8, 3.25);">Level 8</button>
+	<button onclick="start(8, 3.5);">Level 9</button>
+	<button onclick="start(6, 3.5);">Level 10</button>
 </span><br/><span id="messages"></span><canvas width="1000px" height="1000px"></canvas></body><script>
 var objects = [],
 	seed1 = Math.random(),
@@ -76,7 +76,7 @@ function run_loop() {
 		return;
 	} else if (guy.y <= -5000 && dragon.speed > 0) {
 		dragon.speed = -dragon.speed;
-		$("#messages").append('<h1">You got the sword!</h1>');
+		$("#messages").append('<h1>You got the sword!</h1>');
 		setTimeout(function () { $("#messages").empty(); }, 1000);
 	}
 	if (dist > 1000) {
@@ -84,7 +84,7 @@ function run_loop() {
 			dragon.x += (guy.x - dragon.x) * dragon.speed / dist;
 			dragon.y += (guy.y - dragon.y) * dragon.speed / dist;
 		} else if (dist > 2000) {
-			$("#messages").append('<h1">The dragon got away. You lose.</h1>');
+			$("#messages").append('<h1>The dragon got away. You lose.</h1>');
 			$("#buttons")[0].removeAttribute("hidden");
 			return;
 		}
@@ -97,7 +97,7 @@ $(document).keydown(function(e) {
 		going_left = true;
 	} else if (e.which == 39) {
 		going_right = true;
-	} else if (falls < 3 && fall_speed > 0 && e.which == 32) {
+	} else if (falls < 3 && fall_speed > 0 && (e.which == 32 || e.which == 38) {
 		fall_speed = -jump_speed;
 	}
 });
