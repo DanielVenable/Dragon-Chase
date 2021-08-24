@@ -2,7 +2,7 @@
 A game where you try to escape a dragon by jumping on platforms
 
 ## Setup
-Run [Dragon Chase.html]() in a web browser
+Run [Dragon Chase.html](Dragon%20Chase.html) in a web browser
 
 ## How to play
 You are a knight trying to slay a dragon.
